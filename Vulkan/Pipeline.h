@@ -9,15 +9,19 @@ namespace Engine
 {
 	struct PipelineConfigInfo
 	{
-		VkViewport viewport;
-		VkRect2D scissor;
-		VkPipelineViewportStateCreateInfo viewportInfo;
-		VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
-		VkPipelineRasterizationStateCreateInfo rasterizationInfo;
-		VkPipelineMultisampleStateCreateInfo multisampleInfo;
-		VkPipelineColorBlendAttachmentState colorBlendAttachment;
-		VkPipelineColorBlendStateCreateInfo colorBlendInfo;
-		VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
+		PipelineConfigInfo() = default;
+		PipelineConfigInfo(PipelineConfigInfo&) = delete;
+		PipelineConfigInfo& operator=(PipelineConfigInfo&) = delete;
+
+		VkPipelineViewportStateCreateInfo viewportInfo = {};
+		VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo = {};
+		VkPipelineRasterizationStateCreateInfo rasterizationInfo = {};
+		VkPipelineMultisampleStateCreateInfo multisampleInfo = {};
+		VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
+		VkPipelineColorBlendStateCreateInfo colorBlendInfo = {};
+		VkPipelineDepthStencilStateCreateInfo depthStencilInfo = {};
+		std::vector<VkDynamicState> dynamicStateEnables = {};
+		VkPipelineDynamicStateCreateInfo dynamicStateInfo = {};
 		VkPipelineLayout pipelineLayout = nullptr;
 		VkRenderPass renderPass = nullptr;
 		uint32_t subpass = 0;
@@ -33,7 +37,7 @@ namespace Engine
 		Pipeline& operator=(const Pipeline&) = delete;
 
 		void Bind(VkCommandBuffer commandBuffer);
-		static void DefaultPipelineConfig(PipelineConfigInfo& configInfo, std::pair<int, int> windowSize);
+		static void DefaultPipelineConfig(PipelineConfigInfo& configInfo);
 
 	private:
 		void CreateGraphicsPipeline(const std::string& vertexShaderPath, const std::string fragmentShaderPath, const PipelineConfigInfo& configInfos);

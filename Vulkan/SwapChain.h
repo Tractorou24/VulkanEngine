@@ -4,6 +4,7 @@
 
 #include <vulkan/vulkan.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -14,10 +15,11 @@ namespace Engine {
 		static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 		SwapChain(Device& deviceRef, VkExtent2D windowExtent);
+		SwapChain(Device& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previous);
 		~SwapChain();
 
 		SwapChain(const SwapChain&) = delete;
-		void operator=(const SwapChain&) = delete;
+		SwapChain&& operator=(const SwapChain&) = delete;
 
 		VkFramebuffer GetFrameBuffer(int index) { return m_swapChainFramebuffers[index]; }
 		VkRenderPass GetRenderPass() { return m_renderPass; }
@@ -35,6 +37,7 @@ namespace Engine {
 		VkResult SubmitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);
 
 	private:
+		void Init();
 		void CreateSwapChain();
 		void CreateImageViews();
 		void CreateDepthResources();
@@ -51,6 +54,7 @@ namespace Engine {
 		Device& m_device;
 		VkExtent2D m_windowExtent;
 		VkSwapchainKHR m_swapChain;
+		std::shared_ptr<SwapChain> m_oldSwapChain;
 		size_t m_currentFrame = 0;
 
 		std::vector<VkFramebuffer> m_swapChainFramebuffers;

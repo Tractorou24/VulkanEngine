@@ -13,12 +13,14 @@ namespace Engine {
 	SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent)
 		: m_device{ deviceRef }, m_windowExtent{ extent }
 	{
-		CreateSwapChain();
-		CreateImageViews();
-		CreateRenderPass();
-		CreateDepthResources();
-		CreateFramebuffers();
-		CreateSyncObjects();
+		Init();
+	}
+
+	SwapChain::SwapChain(Device& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previous)
+		: m_device(deviceRef), m_windowExtent(windowExtent), m_oldSwapChain(previous)
+	{
+		Init();
+		m_oldSwapChain = nullptr;
 	}
 
 	SwapChain::~SwapChain()
@@ -98,6 +100,16 @@ namespace Engine {
 		return result;
 	}
 
+	void SwapChain::Init()
+	{
+		CreateSwapChain();
+		CreateImageViews();
+		CreateRenderPass();
+		CreateDepthResources();
+		CreateFramebuffers();
+		CreateSyncObjects();
+	}
+
 	void SwapChain::CreateSwapChain()
 	{
 		SwapChainSupportDetails swapChainSupport = m_device.GetSwapChainSupport();
@@ -139,7 +151,7 @@ namespace Engine {
 		createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 		createInfo.presentMode = presentMode;
 		createInfo.clipped = VK_TRUE;
-		createInfo.oldSwapchain = VK_NULL_HANDLE;
+		createInfo.oldSwapchain = (m_oldSwapChain == nullptr) ? VK_NULL_HANDLE : m_oldSwapChain->m_swapChain;
 
 		if (vkCreateSwapchainKHR(m_device.GetDevice(), &createInfo, nullptr, &m_swapChain) != VK_SUCCESS)
 			throw std::runtime_error("Failed to create swap chain !");
@@ -327,7 +339,7 @@ namespace Engine {
 	VkSurfaceFormatKHR SwapChain::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 	{
 		for (const auto& availableFormat : availableFormats) {
-			if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+			if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
 				return availableFormat;
 		}
 		return availableFormats[0];

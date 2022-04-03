@@ -27,12 +27,15 @@ namespace Engine
 		void CreateCommandBuffers();
 		void DrawFrame();
 		void LoadModels();
+		void RecreateSwapChain();
+		void RecordCommandBuffer(int imageIndex);
+		void FreeCommandBuffers();
 
 	private:
 		Window m_window{ 640, 480, "Hello Vulkan" };
 		Device m_device{ m_window };
 		std::unique_ptr<Pipeline> m_pipeline;
-		SwapChain m_swapChain{ m_device, m_window.GetExtent() };
+		std::unique_ptr<SwapChain> m_swapChain;
 		std::unique_ptr<Model> m_model;
 
 		VkPipelineLayout m_pipelineLayout;
